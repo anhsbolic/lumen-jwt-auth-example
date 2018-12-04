@@ -14,3 +14,24 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+/**
+ * PUBLIC
+ * JWT NOT REQUIRED
+ * version : v1
+ */
+$router->group(['prefix' => 'v1'], function () use ($router) {
+    //auth
+    $router->post('/auth/login', 'AuthController@login');
+});
+
+/**
+ * PRIVATE
+ * JWT REQUIRED
+ * version : v1
+ */
+$router->group(['prefix' => 'v1', 'middleware' => 'auth.jwtRefresh'], function () use ($router) {
+    //auth
+    $router->post('auth/logout', 'AuthController@logout');
+    $router->get('auth/me', 'AuthController@me'); 
+});
