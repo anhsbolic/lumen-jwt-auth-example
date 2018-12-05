@@ -8,6 +8,7 @@ use Tymon\JWTAuth\Token;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use App\Utils\CliLog;
 
 class JwtRefreshAuth
 {
@@ -39,7 +40,13 @@ class JwtRefreshAuth
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        // get token
+        /**
+         *
+         * Dont Forget to Delete All Log ^-^
+         */
+        $log = new CliLog();
+
+        // Get Token
         try {
             $this->jwtAuth->parseToken();
             $token = $this->jwtAuth->getToken();
