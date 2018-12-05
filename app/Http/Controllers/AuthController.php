@@ -65,23 +65,7 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     { 
-        $token = json_decode($request->token);
-        $token_refreshed = $token->refreshed;
-        $access_token = $token->access_token;
-        
-        if ($token_refreshed) {
-            $code = 400;
-            $status = false;
-            $data = $access_token;
-            $msg = "token refreshed";
-        } else {
-            $code = 200;
-            $status = true;
-            $data = $this->jwtAuth->user();
-            $msg = "me";
-        }
-
-        return $this->myResponse($code, $status, $data, $msg);
+        return $this->myResponse(200, true, $this->jwtAuth->user(), "me");
     }
 
     /**

@@ -63,8 +63,10 @@ $app->singleton(
 //     App\Http\Middleware\ExampleMiddleware::class
 // ]);
 
+
 $app->routeMiddleware([
     'auth.jwtRefresh' => App\Http\Middleware\JwtRefreshAuth::class,
+    'api.jwtRoutes' => App\Http\Middleware\JwtRoutesApi::class,
 ]);
 
 /*

@@ -31,7 +31,15 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
  * version : v1
  */
 $router->group(['prefix' => 'v1', 'middleware' => 'auth.jwtRefresh'], function () use ($router) {
-    //auth
-    $router->post('auth/logout', 'AuthController@logout');
-    $router->get('auth/me', 'AuthController@me'); 
+    /**
+     * api.jwtRoutes middleware : refreshed token handler
+     * 1. token not refreshed => pass request to controller
+     * 2. token refreshed => stop request, send refreshed token to client
+     */
+    $router->group(['middleware' => 'api.jwtRoutes'], function () use ($router) {
+        //auth
+        $router->post('auth/logout', 'AuthController@logout');
+        $router->get('auth/me', 'AuthController@me'); 
+
+    });
 });
