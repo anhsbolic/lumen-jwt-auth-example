@@ -47,6 +47,8 @@ class AuthController extends Controller
         ]);
 
         try {
+            $this->jwtAuth->factory()->setTTL(60); // set JWT time to live in minutes
+
             if (! $token = $this->jwtAuth->attempt($request->only('email', 'password'))) {
                 return $this->myResponse(404, false, [], "user not found");
             }
@@ -55,7 +57,7 @@ class AuthController extends Controller
         }
 
         // $this->jwtAuth->factory()->setTTL(1);
-        return $this->myResponse(200, true, ["access_token" => $token, "expire_in" => $this->jwtAuth->factory()->getTTL()], "login success");
+        return $this->myResponse(200, true, ["access_token" => $token], "login success");
     }
 
     /**
