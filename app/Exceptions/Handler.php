@@ -10,6 +10,7 @@ use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Http\Response;
 
+
 class Handler extends ExceptionHandler
 {
     /**
@@ -47,9 +48,18 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $exception)
     {
         if ($request->ajax() || $request->wantsJson()) {
-            $status = $exception->getStatusCode();
-            $message = $exception->getMessage();
-            
+
+            $status = 500;
+            $message = "Internal Server Error";
+
+            if (method_exists($exception, "getStatusCode")) {
+                $status = $exception->getStatusCode();
+                $message = $exception->getMessage();
+            } else {
+                $status = 500;
+                $message = "Internal Server Error";
+            }
+
             return response()->json([
                 'success' => false,
                 'status' => $status,

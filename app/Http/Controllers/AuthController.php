@@ -54,7 +54,8 @@ class AuthController extends Controller
             return $this->myResponse($e->getStatusCode(), false, [], $e->getMessage());
         }
 
-        return $this->myResponse(200, true, ["access_token" => $token], "login success");
+        // $this->jwtAuth->factory()->setTTL(1);
+        return $this->myResponse(200, true, ["access_token" => $token, "expire_in" => $this->jwtAuth->factory()->getTTL()], "login success");
     }
 
     /**
@@ -62,11 +63,25 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function me()
-    {
-        $data = $this->jwtAuth->user();
+    public function me(Request $request)
+    { 
+        $token = json_decode($request->token);
+        $token_refreshed = $token->refreshed;
+        $access_token = $token->access_token;
         
-        return $this->myResponse(200, true, $data, "me");
+        if ($token_refreshed) {
+            $code = 400;
+            $status = false;
+            $data = $access_token;
+            $msg = "token refreshed";
+        } else {
+            $code = 200;
+            $status = true;
+            $data = $this->jwtAuth->user();
+            $msg = "me";
+        }
+
+        return $this->myResponse($code, $status, $data, $msg);
     }
 
     /**

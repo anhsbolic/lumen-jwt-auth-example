@@ -8,7 +8,6 @@ use Tymon\JWTAuth\Token;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
-use App\Utils\CliLog;
 
 class JwtRefreshAuth
 {
@@ -40,12 +39,6 @@ class JwtRefreshAuth
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        /**
-         *
-         * Dont Forget to Delete All Log ^-^
-         */
-        $log = new CliLog();
-
         // Get Token
         try {
             $this->jwtAuth->parseToken();
@@ -59,6 +52,8 @@ class JwtRefreshAuth
         try {
             // save user on request object
             $request->user = $this->jwtAuth->authenticate($token);
+            $token = array('refreshed' => false, 'access_token' => "");
+            $request->token = json_encode($token);
         } catch (TokenBlacklistedException $e) {
             // token blacklisted
             abort(401, "Unauthorized");
@@ -70,8 +65,12 @@ class JwtRefreshAuth
                     $token = $this->jwtAuth->refresh($token);
                     $this->jwtAuth->setToken($token);    
     
-                    // Authenticate with new token, save user on request
+                    /**
+                     * Authenticate with new token, save user & token flag on request
+                     */
                     $request->user = $this->jwtAuth->authenticate($token);
+                    $token = array('refreshed' => true, 'access_token' => $token);
+                    $request->token = json_encode($token);
 
                 } catch(TokenExpiredException $e) {
                     // failed refresh token (token still expired)
